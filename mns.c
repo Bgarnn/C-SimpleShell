@@ -7,8 +7,8 @@ gcc -I/usr/local/Cellar/readline/8.2.1/include -L/usr/local/Cellar/readline/8.2.
 /*
 	- readline
 	- signal
-	- unorganized_token <-- NOW (input_to_token, split_space)
-	- organized_token
+	- unorganized_token (except error , $, ~)
+	- organized_token <-- NOW
 	- err_check
 	- grouped_token
 */
@@ -19,10 +19,9 @@ gcc -I/usr/local/Cellar/readline/8.2.1/include -L/usr/local/Cellar/readline/8.2.
 ////////////////////////////**DEBUG FUNCTION**////////////////////////////////////
 
 // print token_node 
-// token_mark อ่านเป็น index ex. m_undefined = 0, m_heredoc = 1,...
 void print_token_node(t_token_node *node) {
 if (node) {
-	printf("Mark: %u\n", node->mark);
+	printf("Mark: %u\n", node->mark); // show in index
 	printf("Type: %s\n", node->type); 
 	printf("Value: %s\n", node->value); 
 } else {
@@ -91,7 +90,164 @@ char	*match_outside_qoute(char *tmp_ptr, char *must_match, int match_in_dbq)
 	return (tmp_ptr);
 }
 
+void	split_quote(t_data *data, t_token_ptr *tmp_ptr, t_token_node *src_head)
+{
+	int		sq;
+	int		dbq;
+	char	*res;
+	size_t	i;
+	size_t	res_i;
+
+	(void)(data);
+	sq = 0;
+	dbq = 0;
+	i = 0;
+	res_i = 0;
+	res = ft_calloc(ft_strlen(src_head->value) + 1, 1);
+	while (src_head->value[i])
+	{
+		if (!sq && src_head->value[i] == '\"')
+			dbq = !dbq;
+		else if (!dbq && src_head->value[i] == '\'')
+			sq = !sq;
+		else
+			res[res_i++] = src_head->value[i];
+		i++;
+	}
+	token_node_create(tmp_ptr, src_head->mark)->value = res;
+}
+
+void	split_pipe(t_data *data, t_token_ptr *tmp_ptr, t_token_node *src_head)
+{
+	char	*main_cptr;
+	char	*match_cptr;
+	size_t	len;
+
+	(void)(data);
+	main_cptr = src_head->value;
+	match_cptr = src_head->value;
+	while (1)
+	{
+		match_cptr = match_outside_qoute(match_cptr, "|", 0);
+		len = match_cptr - main_cptr;
+		if (len)
+			token_node_create(tmp_ptr, src_head->mark)->value = ft_substr(main_cptr, 0, len);
+		if (*match_cptr)
+			token_node_create(tmp_ptr, m_pipe)->value = ft_strdup("|");
+		else
+			break ;
+		match_cptr += 1;
+		main_cptr = match_cptr;
+	}
+}
+
+void	split_infile(t_data *data, t_token_ptr *tmp_ptr, t_token_node *src_head)
+{
+	char	*main_cptr;
+	char	*match_cptr;
+	size_t	len;
+
+	(void)(data);
+	main_cptr = src_head->value;
+	match_cptr = src_head->value;
+	if (src_head->mark == m_heredoc)
+	{
+		token_node_create(tmp_ptr, src_head->mark)->value = ft_strdup("<<");
+		return ;
+	}
+	while (1)
+	{
+		match_cptr = match_outside_qoute(match_cptr, "<", 0);
+		len = match_cptr - main_cptr;
+		if (len)
+			token_node_create(tmp_ptr, src_head->mark)->value = ft_substr(main_cptr, 0, len);
+		if (*match_cptr)
+			token_node_create(tmp_ptr, m_infile)->value = ft_strdup("<");
+		else
+			break ;
+		match_cptr += 1;
+		main_cptr = match_cptr;
+	}
+}
+
 ////////////////////////////input_to_token_utils1.c////////////////////////////////////
+
+static void	split_out_trunc(t_data *data, t_token_ptr *tmp_ptr, t_token_node *src_head)
+{
+	char	*main_cptr;
+	char	*match_cptr;
+	size_t	len;
+
+	(void)(data);
+	main_cptr = src_head->value;
+	match_cptr = src_head->value;
+	if (src_head->mark == m_out_append)
+	{
+		token_node_create(tmp_ptr, src_head->mark)->value = ft_strdup(">>");
+		return ;
+	}
+	while (1)
+	{
+		match_cptr = match_outside_qoute(match_cptr, ">", 0);
+		len = match_cptr - main_cptr;
+		if (len)
+			token_node_create(tmp_ptr, src_head->mark)->value = ft_substr(main_cptr, 0, len);
+		if (*match_cptr)
+			token_node_create(tmp_ptr, m_out_trunc)->value = ft_strdup(">");
+		else
+			break ;
+		match_cptr += 1;
+		main_cptr = match_cptr;
+	}
+}
+
+static void	split_out_append(t_data *data, t_token_ptr *tmp_ptr, t_token_node *src_head)
+{
+	char	*main_cptr;
+	char	*match_cptr;
+	size_t	len;
+
+	(void)(data);
+	main_cptr = src_head->value;
+	match_cptr = src_head->value;
+	while (1)
+	{
+		match_cptr = match_outside_qoute(match_cptr, ">>", 0);
+		len = match_cptr - main_cptr;
+		if (len)
+			token_node_create(tmp_ptr, src_head->mark)->value = ft_substr(main_cptr, 0, len);
+		if (*match_cptr)
+			token_node_create(tmp_ptr, m_out_append)->value = ft_strdup(">>");
+		else
+			break ;
+		match_cptr += 2;
+		main_cptr = match_cptr;
+	}
+}
+
+static void	split_heredoc(t_data *data, t_token_ptr *tmp_ptr, t_token_node *src_head)
+{
+	char	*main_cptr;
+	char	*match_cptr;
+	size_t	len;
+
+	(void)(data);
+	main_cptr = src_head->value;
+	match_cptr = src_head->value;
+	while (1)
+	{
+		match_cptr = match_outside_qoute(match_cptr, "<<", 0);
+		len = match_cptr - main_cptr;
+		if (len)
+			token_node_create(tmp_ptr, src_head->mark)->value = ft_substr(main_cptr, 0, len);
+		if (*match_cptr)
+			token_node_create(tmp_ptr, m_heredoc)->value = ft_strdup("<<");
+		else
+			break ;
+		match_cptr += 2;
+		main_cptr = match_cptr;
+	}
+}
 
 static void	split_space(t_data *data, t_token_ptr *tmp_ptr, t_token_node *src_head)
 {
@@ -160,7 +316,18 @@ void	input_to_token(t_data *data, char *input)
 	token_node_create(&tmp1, m_undefined)->value = input;
 	// free(input); //ไม่แน่ใจว่าต้องฟรีมั้ย แต่เอาค่าไป = valueแล้ว ซึ่งจะฟรีvalueทีหลัง
 	token_split (data, &tmp1, &tmp2, split_space);
-	print_link_list(tmp2.head); // ** DEBUG **
+	token_split (data, &tmp2, &tmp1, split_heredoc);
+	token_split (data, &tmp1, &tmp2, split_out_append);
+	token_split (data, &tmp2, &tmp1, split_out_trunc);
+	token_split (data, &tmp1, &tmp2, split_infile);
+	token_split (data, &tmp2, &tmp1, split_pipe);
+	// token_split (data, &tmp1, &tmp2, split_dollar_sign); ** not finish **
+	// token_split (data, &tmp2, &tmp1, split_tilde_symbol); ** not finish **
+	token_split (data, &tmp1, &tmp2, split_quote);
+	data->unorganized_token.head = tmp2.head;
+	data->unorganized_token.tail = tmp2.tail;
+
+	print_link_list(data->unorganized_token.head); // ** DEBUG **
 }
 
 ////////////////////////////mns_free.c////////////////////////////////////
