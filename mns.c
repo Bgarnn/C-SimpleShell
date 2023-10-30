@@ -19,25 +19,71 @@ gcc -I/usr/local/Cellar/readline/8.2.1/include -L/usr/local/Cellar/readline/8.2.
 ////////////////////////////**DEBUG FUNCTION**////////////////////////////////////
 
 // print token_node 
-void print_token_node(t_token_node *node) {
-if (node) {
-	printf("Mark: %u\n", node->mark); // show in index
-	printf("Type: %s\n", node->type); 
-	printf("Value: %s\n", node->value); 
-} else {
-	printf("Node is NULL\n");
-}
+void print_token_node(t_token_node *node) 
+{
+	if (node) 
+	{
+		printf("Mark: %u\n", node->mark); // show in index
+		printf("Type: %s\n", node->type); 
+		printf("Value: %s\n", node->value); 
+	} 
+	else
+		printf("Node is NULL\n");
 }
 
 // print link list
-void print_link_list(t_token_node *head) {
+void print_link_list(t_token_node *head) 
+{
+	int i = 1;
 	t_token_node *current = head;
-	while (current != NULL) {
+	while (current != NULL)
+	{
+		printf("\nnumber: %d\n", i);
 		print_token_node(current);
+		printf("\n");
 		current = current->next;
+		i++;
 	}
-	printf("NULL\n");
+	printf("\nNULL\n");
 }
+
+////////////////////////////mns_free.c////////////////////////////////////
+
+void	free_mns(t_data *data)
+{
+	rl_clear_history();
+}
+
+void	free_char_2d(char **ptr)
+{
+	int	i;
+
+	i = 0;
+	if (!ptr)
+		return ;
+	while (ptr[i])
+	{
+		free(ptr[i]);
+		ptr[i] = NULL;
+		i++;
+	}
+	free (ptr);
+	ptr = NULL;
+}
+
+void	free_token_list(t_token_node *token_ptr)
+{
+	t_token_node	*tmp_node;
+
+	while (token_ptr)
+	{
+		tmp_node = token_ptr->next;
+		free(token_ptr->value);
+		free(token_ptr);
+		token_ptr = tmp_node;
+	}
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -67,6 +113,176 @@ t_token_node	*token_node_create (t_token_ptr *ptr, t_token_mark mark)
 		return (new);
 	}
 }
+
+/////////////////////////////token_to_organize_utils.c///////////////////////////////////
+
+
+void	group_init (t_list_ptr	*group)
+{
+	group->infile.head = 0;
+	group->infile.tail = 0;
+	group->outfile.head = 0;
+	group->outfile.tail = 0;
+	group->cmd.head = 0;
+	group->cmd.tail = 0;
+}
+
+void	skip_next_node(t_token_node *node)
+{
+	t_token_node	*tmp;
+
+	if(!node->next)
+		return ;
+	tmp = node->next;
+	node->next = node->next->next;
+	free(tmp->value);
+	free(tmp);
+}
+///////////////////////////////token_to_organize.c//////////////////////////////////////
+
+	// t_token_node *dst_tail;
+	
+	// if (!src || !src->head)
+	// 	return ;
+	// if (!dst)
+	// 	dst->next = src->head
+	// if (dst)
+	// {
+	// 	dst_tail = dst;
+	// 	while (dst_tail->next)
+	// 		dst_tail = dst_tail->next;
+	// 	dst_tail->next = sec->head;
+	// }
+
+	
+void	move_token(t_token_ptr *src, t_token_ptr *dst)
+{
+	// if (!dst || !src || !src->head)
+	// 	return ;
+	if (!dst->head)
+	{
+		dst->head = src->head;
+		dst->tail = src->tail;
+	}
+	else
+	{
+		dst->tail->next = src->head;
+		dst->tail = src->tail;
+	}
+}
+
+void	tmp_group_to_organize(t_list_ptr *group, t_token_ptr *output, int pipe)
+{
+	//in each of tmp group is link list
+	//move_token: is to move from one link llist(in tmp group) to another link list(output)
+
+
+	if(group->cmd.head)
+		move_token(&group->cmd, output);
+	if(group->infile.head)
+		move_token(&group->infile, output);
+	// print_link_list(output->head); // ** DEBUG **********************************************************************
+	// printf("infile:\n");// ** DEBUG **********************************************************************
+	// print_link_list(group->infile.head); // ** DEBUG **********************************************************************
+	// printf("\nHi\n");// ** DEBUG **********************************************************************
+	
+	if(group->outfile.head)
+		move_token(&group->outfile, output);
+
+
+	if (pipe)
+		token_node_create(output, m_pipe)->value = ft_strdup("|");
+	// if (!group->cmd.head->value)
+	// {
+	// 	output->head = 
+	// }
+	group_init (group);
+}
+
+void	unorganize_to_tmp_group(t_list_ptr *group, t_token_ptr *output, t_token_node *src_head)
+{
+	if (src_head->mark == m_undefined)
+		token_node_create(&group->cmd, m_cmd)->value = ft_strdup(src_head->value);
+	if (src_head->next)
+	{
+		if (src_head->mark == m_heredoc || src_head->mark == m_infile)
+		{
+			token_node_create(&group->infile, src_head->mark)->value = ft_strdup(src_head->next->value);
+			skip_next_node(src_head);
+		}
+		if (src_head->mark == m_out_append|| src_head->mark == m_out_trunc)
+		{
+			token_node_create(&group->outfile, src_head->mark)->value = ft_strdup(src_head->next->value);
+			skip_next_node(src_head);
+		}
+	}
+	else
+		return(tmp_group_to_organize(group, output, 0));
+	if (src_head->mark == m_pipe)
+		return(tmp_group_to_organize(group, output, 1));
+}
+
+void	unorganize_to_organize(t_list_ptr *group, t_token_ptr *src, t_token_ptr *dst)
+{
+	t_token_ptr		tmp_ptr;
+	t_token_node	*head_ptr;
+
+	tmp_ptr.head = 0;
+	tmp_ptr.tail = 0;
+	while (src->head)
+	{
+		if(!src || !dst || !src->head)
+			return ;
+		unorganize_to_tmp_group(group, &tmp_ptr, src->head);
+		head_ptr = src->head;
+		src->head = src->head->next;
+		free(head_ptr->value);
+		free(head_ptr);
+		if(!tmp_ptr.head)
+			return ;
+		if (!dst->head)
+			dst->head = tmp_ptr.head;
+		else
+			dst->tail->next = tmp_ptr.tail;
+		dst->tail = tmp_ptr.tail;
+	}
+}
+
+void	token_to_organize(t_data *data, t_token_ptr *input)
+{
+	t_list_ptr	tmp_group;
+	// t_token_ptr	*success_group_token;
+
+	// success_group_token = &data->grouped_token;
+
+	print_link_list(data->organized_token.head); // ** DEBUG ********************************************************************
+	int i = 0;
+	group_init (&tmp_group);
+	while (input->head)
+	{
+		if(!input->head->value)
+		{
+			free_token_list(tmp_group.infile.head);
+			free_token_list(tmp_group.outfile.head);
+			free_token_list(tmp_group.cmd.head);
+			free_token_list(input->head);
+			free_token_list(data->organized_token.head);
+			return ;
+		}
+		unorganize_to_organize(&tmp_group, input, &data->organized_token);
+	}
+	// print_link_list(data->organized_token.head); // ** DEBUG ******************************************************************
+
+	// err_check(data);
+	// ungroup_to_group(data);
+	// if (!success_group_token)
+	// {
+	// 	free_mns(data);
+	// 	exit (0);
+	// }
+}
+
+
 
 ////////////////////////////input_to_token_utils2.c////////////////////////////////////
 
@@ -327,31 +543,7 @@ void	input_to_token(t_data *data, char *input)
 	data->unorganized_token.head = tmp2.head;
 	data->unorganized_token.tail = tmp2.tail;
 
-	print_link_list(data->unorganized_token.head); // ** DEBUG **
-}
-
-////////////////////////////mns_free.c////////////////////////////////////
-
-void	mns_free(t_data *data)
-{
-	rl_clear_history();
-}
-
-void	free_char_2d(char **ptr)
-{
-	int	i;
-
-	i = 0;
-	if (!ptr)
-		return ;
-	while (ptr[i])
-	{
-		free(ptr[i]);
-		ptr[i] = NULL;
-		i++;
-	}
-	free (ptr);
-	ptr = NULL;
+	// print_link_list(data->unorganized_token.head); // ** DEBUG **********************************************************************
 }
 
 ////////////////////////////mns_init.c////////////////////////////////////
@@ -421,6 +613,8 @@ void	mns_init (t_data *data, char **envp)
 	data->env = 0;
 	data->env_row_max = 0;
 	data->unorganized_token.head = 0;
+	data->unorganized_token.tail = 0;
+	data->organized_token.head = 0;
 	data->unorganized_token.tail = 0;
 
 
@@ -492,15 +686,8 @@ static int	main_while (t_data *data)
 	}
 	add_history(input);
 	input_to_token(data, input);
-	// token_to_organize(data);
-
-	// // *np-sam* --> ต้องไปอยู่หลัง organize ก่อน err_check
-	// if (!(data->organized_token))
-	// {
-	// 	mns_free(data);
-	// 	exit (0);
-	// }
-
+	print_link_list(data->unorganized_token.head);
+	// token_to_organize(data, &data->unorganized_token);
 	return(0);
 
 }
@@ -522,7 +709,7 @@ int main(int argc, char **argv, char **envp)
 		g_signal = 0;
 	}
 	printf ("exit\n");
-	mns_free(&data);
+	free_mns(&data);
 	return (0);
 }
 

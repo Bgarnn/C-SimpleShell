@@ -41,6 +41,14 @@ typedef struct s_token_ptr
 	t_token_node		*tail;
 }						t_token_ptr;
 
+typedef struct s_list_ptr
+{
+	t_token_ptr		infile;
+	t_token_ptr		outfile;
+	t_token_ptr		cmd;
+	struct s_list_ptr	*next;
+}						t_list_ptr;
+
 typedef struct s_list_node
 {
 	t_token_node		*infile;
@@ -55,7 +63,7 @@ typedef struct s_data
 	char				**env;
 	size_t				env_row_max;
 	t_token_ptr			unorganized_token;
-	// t_token_ptr			*organized_token;
+	t_token_ptr			organized_token;
 	// t_list_node			**grouped_token;
 }						t_data;
 
