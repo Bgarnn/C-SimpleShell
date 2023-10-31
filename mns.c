@@ -293,7 +293,7 @@ void	unorganize_to_organize(t_list_ptr *group, t_token_ptr *src, t_token_ptr *ds
 	if (!dst->head)
 		dst->head = tmp_ptr.head;
 	else
-		dst->tail->next = tmp_ptr.tail;
+		dst->tail->next = tmp_ptr.head;
 	dst->tail = tmp_ptr.tail;
 
 		
@@ -338,9 +338,10 @@ void	token_to_organize(t_data *data, t_token_ptr *input)
 	}
 	
 	// ** data->organized_token): NOT CORRECT **
+	//correct order, but still have token from last prompt
 
-	// printf("\noutput:\n"); // ** DEBUG ********************************************************************
-	// print_link_list(data->organized_token.head); // ** DEBUG ******************************************************************
+	printf("\noutput:\n"); // ** DEBUG ********************************************************************
+	print_link_list(data->organized_token.head); // ** DEBUG ******************************************************************
 
 
 	// err_check(data);
@@ -562,11 +563,10 @@ void	token_split(t_data *data, t_token_ptr *src, t_token_ptr *dst, void (*fn)(t_
 	t_token_ptr		tmp_ptr;
 	t_token_node	*head_ptr;
 
-	tmp_ptr.head = 0;
-	tmp_ptr.tail = 0;
-
 	while (src->head)
 	{
+		tmp_ptr.head = 0;
+		tmp_ptr.tail = 0;
 		if(!fn || !src || !dst || !src->head)
 			return ;
 		fn (data, &tmp_ptr, src->head);
@@ -579,7 +579,7 @@ void	token_split(t_data *data, t_token_ptr *src, t_token_ptr *dst, void (*fn)(t_
 		if (!dst->head)
 			dst->head = tmp_ptr.head;
 		else
-			dst->tail->next = tmp_ptr.tail;
+			dst->tail->next = tmp_ptr.head;
 		dst->tail = tmp_ptr.tail;
 	}
 }
@@ -757,6 +757,12 @@ static int	main_while (t_data *data)
 	add_history(input);
 	input_to_token(data, input);
 	token_to_organize(data, &data->unorganized_token);
+
+	// ** output: NOT CORRECT **
+
+	// printf("\noutput:\n"); // ** DEBUG ********************************************************************
+	// print_token_node(data->organized_token.head); // ** DEBUG ********************************************************************
+
 	return(0);
 
 }
