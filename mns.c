@@ -177,6 +177,17 @@ void	tmp_group_to_organize(t_list_ptr *group, t_token_ptr *output, int pipe)
 	//move_token: is to move from one link llist(in tmp group) to another link list(output)
 
 
+	// **group(input) : NOT CORRECT**
+	printf("\nCMD output:\n");// ** DEBUG **********************************************************************
+	print_link_list(group->cmd.head); // ** DEBUG **********************************************************************
+
+	printf("\nINFILE output:\n");// ** DEBUG **********************************************************************
+	print_link_list(group->infile.head); // ** DEBUG **********************************************************************
+	
+		printf("\nOUTFILE output:\n");// ** DEBUG **********************************************************************
+	print_link_list(group->outfile.head); // ** DEBUG **********************************************************************
+
+
 	if(group->cmd.head)
 		move_token(&group->cmd, output);
 	if(group->infile.head)
@@ -230,10 +241,19 @@ void	unorganize_to_tmp_group(t_list_ptr *group, t_token_ptr *output, t_token_nod
 		// printf("\nOUTFILE output:\n");// ** DEBUG **********************************************************************
 		// print_link_list(group->outfile.head); // ** DEBUG **********************************************************************
 	}
-	else
-		return(tmp_group_to_organize(group, output, 0));
+	if (src_head->next == 0)
+	{
+		printf("Hi  11\n");
+		return (tmp_group_to_organize(group, output, 0));
+		// tmp_group_to_organize(group, output, 0);
+		printf("Hi  22\n");
+		// return ;
+	}
 	if (src_head->mark == m_pipe)
-		return(tmp_group_to_organize(group, output, 1));
+	{
+		tmp_group_to_organize(group, output, 1);
+		return ;
+	}
 
 	// **group : CORRECT**
 	// printf("\nCMD output:\n");// ** DEBUG **********************************************************************
