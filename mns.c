@@ -201,65 +201,108 @@ void	tmp_group_to_organize(t_list_ptr *group, t_token_ptr *output, int pipe)
 
 void	unorganize_to_tmp_group(t_list_ptr *group, t_token_ptr *output, t_token_node *src_head)
 {
+	// ** input: CORRECT **
+
+	// printf("\nun_to_tmp_g input:\n"); // ** DEBUG ********************************************************************
+	// print_token_node(src_head); // ** DEBUG ********************************************************************
+
 	if (src_head->mark == m_undefined)
 		token_node_create(&group->cmd, m_cmd)->value = ft_strdup(src_head->value);
 	if (src_head->next)
 	{
+		// ** input: CORRECT **
+
+		// printf("\ninput:\n"); // ** DEBUG ********************************************************************
+		// print_token_node(src_head); // ** DEBUG ********************************************************************
+
 		if (src_head->mark == m_heredoc || src_head->mark == m_infile)
 		{
 			token_node_create(&group->infile, src_head->mark)->value = ft_strdup(src_head->next->value);
 			skip_next_node(src_head);
 		}
+	
 		if (src_head->mark == m_out_append|| src_head->mark == m_out_trunc)
 		{
 			token_node_create(&group->outfile, src_head->mark)->value = ft_strdup(src_head->next->value);
 			skip_next_node(src_head);
 		}
+
+		// printf("\nOUTFILE output:\n");// ** DEBUG **********************************************************************
+		// print_link_list(group->outfile.head); // ** DEBUG **********************************************************************
 	}
 	else
 		return(tmp_group_to_organize(group, output, 0));
 	if (src_head->mark == m_pipe)
 		return(tmp_group_to_organize(group, output, 1));
+
+	// **group : CORRECT**
+	// printf("\nCMD output:\n");// ** DEBUG **********************************************************************
+	// print_link_list(group->cmd.head); // ** DEBUG **********************************************************************
+
+	// printf("\nINFILE output:\n");// ** DEBUG **********************************************************************
+	// print_link_list(group->infile.head); // ** DEBUG **********************************************************************
+	
+	// 	printf("\nOUTFILE output:\n");// ** DEBUG **********************************************************************
+	// print_link_list(group->outfile.head); // ** DEBUG **********************************************************************
+
 }
 
 void	unorganize_to_organize(t_list_ptr *group, t_token_ptr *src, t_token_ptr *dst)
 {
 	t_token_ptr		tmp_ptr;
 	t_token_node	*head_ptr;
+	
+	// ** input: CORRECT **
+
+	// printf("\nun_to_or input:\n"); // ** DEBUG ********************************************************************
+	// print_link_list(src->head); // ** DEBUG ********************************************************************
 
 	tmp_ptr.head = 0;
 	tmp_ptr.tail = 0;
-	while (src->head)
-	{
-		if(!src || !dst || !src->head)
-			return ;
-		unorganize_to_tmp_group(group, &tmp_ptr, src->head);
-		head_ptr = src->head;
-		src->head = src->head->next;
-		free(head_ptr->value);
-		free(head_ptr);
-		if(!tmp_ptr.head)
-			return ;
-		if (!dst->head)
-			dst->head = tmp_ptr.head;
-		else
-			dst->tail->next = tmp_ptr.tail;
-		dst->tail = tmp_ptr.tail;
-	}
+	if(!src || !dst || !src->head)
+		return ;
+	unorganize_to_tmp_group(group, &tmp_ptr, src->head);
+	head_ptr = src->head;
+	src->head = src->head->next;
+	free(head_ptr->value);
+	free(head_ptr);
+	if(!tmp_ptr.head)
+		return ;
+	if (!dst->head)
+		dst->head = tmp_ptr.head;
+	else
+		dst->tail->next = tmp_ptr.tail;
+	dst->tail = tmp_ptr.tail;
+
+		
+	// ** dst: NOT CORRECT **
+
+	// printf("\noutput:\n"); // ** DEBUG ********************************************************************
+	// print_link_list(dst->head); // ** DEBUG ******************************************************************
+
 }
 
 void	token_to_organize(t_data *data, t_token_ptr *input)
 {
 	t_list_ptr	tmp_group;
 	// t_token_ptr	*success_group_token;
-
 	// success_group_token = &data->grouped_token;
 
-	print_link_list(data->organized_token.head); // ** DEBUG ********************************************************************
-	int i = 0;
+	// ** input: CORRECT **
+
+	// printf("\nt_to_o input:\n"); // ** DEBUG ********************************************************************
+	// print_link_list(input->head); // ** DEBUG ********************************************************************
+
+	int i = 1;// ** DEBUG ********************************************************************
 	group_init (&tmp_group);
 	while (input->head)
 	{
+		// ** input loop: CORRECT **
+
+		printf("\nwhile loop %d\n", i); // * DEBUG ********************************************************************
+		// print_link_list(input->head); // ** DEBUG ********************************************************************
+		i++;// ** DEBUG ********************************************************************
+
 		if(!input->head->value)
 		{
 			free_token_list(tmp_group.infile.head);
@@ -271,7 +314,12 @@ void	token_to_organize(t_data *data, t_token_ptr *input)
 		}
 		unorganize_to_organize(&tmp_group, input, &data->organized_token);
 	}
+	
+	// ** data->organized_token): NOT CORRECT **
+
+	// printf("\noutput:\n"); // ** DEBUG ********************************************************************
 	// print_link_list(data->organized_token.head); // ** DEBUG ******************************************************************
+
 
 	// err_check(data);
 	// ungroup_to_group(data);
@@ -686,8 +734,7 @@ static int	main_while (t_data *data)
 	}
 	add_history(input);
 	input_to_token(data, input);
-	print_link_list(data->unorganized_token.head);
-	// token_to_organize(data, &data->unorganized_token);
+	token_to_organize(data, &data->unorganized_token);
 	return(0);
 
 }
