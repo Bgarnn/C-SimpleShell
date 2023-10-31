@@ -337,11 +337,11 @@ void	token_to_organize(t_data *data, t_token_ptr *input)
 		unorganize_to_organize(&tmp_group, input, &data->organized_token);
 	}
 	
-	// ** data->organized_token): NOT CORRECT **
-	//correct order, but still have token from last prompt
+	// ** data->organized_token): CORRECT **
+	//correct order and no token from last prompt
 
-	printf("\noutput:\n"); // ** DEBUG ********************************************************************
-	print_link_list(data->organized_token.head); // ** DEBUG ******************************************************************
+	// printf("\noutput:\n"); // ** DEBUG ********************************************************************
+	// print_link_list(data->organized_token.head); // ** DEBUG ******************************************************************
 
 
 	// err_check(data);
@@ -764,7 +764,22 @@ static int	main_while (t_data *data)
 	// print_token_node(data->organized_token.head); // ** DEBUG ********************************************************************
 
 	return(0);
+}
 
+void	free_cmd_history(t_data *data)
+{
+	if(data->unorganized_token.head)
+	{
+		free_token_list(data->unorganized_token.head);
+		data->unorganized_token.head = NULL;
+		data->unorganized_token.tail = NULL;
+	}
+	if(data->organized_token.head)
+	{
+		free_token_list(data->organized_token.head);
+		data->organized_token.head = NULL;
+		data->organized_token.tail = NULL;
+	}
 }
 
 int main(int argc, char **argv, char **envp) 
@@ -782,6 +797,7 @@ int main(int argc, char **argv, char **envp)
 		g_signal = 1;
 		// excute_cmd(&data);
 		g_signal = 0;
+		free_cmd_history(&data);
 	}
 	printf ("exit\n");
 	free_mns(&data);
