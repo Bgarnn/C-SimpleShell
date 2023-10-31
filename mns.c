@@ -177,7 +177,8 @@ void	tmp_group_to_organize(t_list_ptr *group, t_token_ptr *output, int pipe)
 	//move_token: is to move from one link llist(in tmp group) to another link list(output)
 
 
-	// **group(input) : NOT CORRECT**
+	// **group(input) : CORRECT**
+	printf("\nGROUP INPUT\n");
 	printf("\nCMD output:\n");// ** DEBUG **********************************************************************
 	print_link_list(group->cmd.head); // ** DEBUG **********************************************************************
 
@@ -241,19 +242,13 @@ void	unorganize_to_tmp_group(t_list_ptr *group, t_token_ptr *output, t_token_nod
 		// printf("\nOUTFILE output:\n");// ** DEBUG **********************************************************************
 		// print_link_list(group->outfile.head); // ** DEBUG **********************************************************************
 	}
-	if (src_head->next == 0)
-	{
-		printf("Hi  11\n");
+	if (!src_head->next)
 		return (tmp_group_to_organize(group, output, 0));
 		// tmp_group_to_organize(group, output, 0);
-		printf("Hi  22\n");
 		// return ;
-	}
+	
 	if (src_head->mark == m_pipe)
-	{
-		tmp_group_to_organize(group, output, 1);
-		return ;
-	}
+		return (tmp_group_to_organize(group, output, 0));
 
 	// **group : CORRECT**
 	// printf("\nCMD output:\n");// ** DEBUG **********************************************************************
