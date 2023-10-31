@@ -178,15 +178,15 @@ void	tmp_group_to_organize(t_list_ptr *group, t_token_ptr *output, int pipe)
 
 
 	// **group(input) : CORRECT**
-	printf("\nGROUP INPUT\n");
-	printf("\nCMD output:\n");// ** DEBUG **********************************************************************
-	print_link_list(group->cmd.head); // ** DEBUG **********************************************************************
+	// printf("\nGROUP INPUT\n");
+	// printf("\nCMD output:\n");// ** DEBUG **********************************************************************
+	// print_link_list(group->cmd.head); // ** DEBUG **********************************************************************
 
-	printf("\nINFILE output:\n");// ** DEBUG **********************************************************************
-	print_link_list(group->infile.head); // ** DEBUG **********************************************************************
+	// printf("\nINFILE output:\n");// ** DEBUG **********************************************************************
+	// print_link_list(group->infile.head); // ** DEBUG **********************************************************************
 	
-		printf("\nOUTFILE output:\n");// ** DEBUG **********************************************************************
-	print_link_list(group->outfile.head); // ** DEBUG **********************************************************************
+	// 	printf("\nOUTFILE output:\n");// ** DEBUG **********************************************************************
+	// print_link_list(group->outfile.head); // ** DEBUG **********************************************************************
 
 
 	if(group->cmd.head)
@@ -203,7 +203,10 @@ void	tmp_group_to_organize(t_list_ptr *group, t_token_ptr *output, int pipe)
 
 
 	if (pipe)
+	{
 		token_node_create(output, m_pipe)->value = ft_strdup("|");
+	}
+
 	// if (!group->cmd.head->value)
 	// {
 	// 	output->head = 
@@ -248,7 +251,7 @@ void	unorganize_to_tmp_group(t_list_ptr *group, t_token_ptr *output, t_token_nod
 		// return ;
 	
 	if (src_head->mark == m_pipe)
-		return (tmp_group_to_organize(group, output, 0));
+		return (tmp_group_to_organize(group, output, 1));
 
 	// **group : CORRECT**
 	// printf("\nCMD output:\n");// ** DEBUG **********************************************************************
@@ -272,11 +275,15 @@ void	unorganize_to_organize(t_list_ptr *group, t_token_ptr *src, t_token_ptr *ds
 	// printf("\nun_to_or input:\n"); // ** DEBUG ********************************************************************
 	// print_link_list(src->head); // ** DEBUG ********************************************************************
 
-	tmp_ptr.head = 0;
-	tmp_ptr.tail = 0;
 	if(!src || !dst || !src->head)
 		return ;
+	tmp_ptr.head = 0;
+	tmp_ptr.tail = 0;
 	unorganize_to_tmp_group(group, &tmp_ptr, src->head);
+
+	// **tmp_ptr: CORRECT**
+	// print_link_list(tmp_ptr.head);// ** DEBUG ********************************************************************
+
 	head_ptr = src->head;
 	src->head = src->head->next;
 	free(head_ptr->value);
@@ -678,7 +685,7 @@ void	mns_init (t_data *data, char **envp)
 	data->unorganized_token.head = 0;
 	data->unorganized_token.tail = 0;
 	data->organized_token.head = 0;
-	data->unorganized_token.tail = 0;
+	data->organized_token.tail = 0;
 
 
 	signal_init (data);
