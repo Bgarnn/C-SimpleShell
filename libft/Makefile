@@ -44,24 +44,24 @@ all: $(NAME)
 
 # Compilation Rule for C Files
 $(OBJ_DIR)%.o: %.c
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(@D)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 # Target to Create the Library
 $(NAME): $(OBJS)
-	ar rcs $(NAME) $(OBJS)
+	@ar rcs $(NAME) $(OBJS)
 
 # Bonus Target (if applicable)
 bonus: $(OBJS_BONUS)
-	ar rcs $(NAME) $(OBJS_BONUS)
+	@ar rcs $(NAME) $(OBJS_BONUS)
 
 # Clean Up Object Files
 clean:
-	rm -rf $(OBJ_DIR)
+	@rm -rf $(OBJ_DIR)
 
 # Clean Everything
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 # Rebuild Everything
 re: fclean all
