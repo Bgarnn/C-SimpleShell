@@ -1,25 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstiter_bonus.c                                 :+:      :+:    :+:   */
+/*   pwd_built_in.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/25 16:01:50 by kburalek          #+#    #+#             */
-/*   Updated: 2023/11/07 21:06:10 by plertsir         ###   ########.fr       */
+/*   Created: 2023/11/05 11:31:01 by plertsir          #+#    #+#             */
+/*   Updated: 2023/11/07 21:05:49 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-void	ft_lstiter(t_list *lst, void (*f)(void *))
+int	get_curr_dir(t_data *data)
 {
-	if (lst != 0 && f != 0)
+	char	curr_dir[PATH_MAX];
+
+	if (!getcwd(curr_dir, PATH_MAX))
 	{
-		while (lst != 0)
-		{
-			f(lst->content);
-			lst = lst->next;
-		}
+		perror("getcwd");
+		free_everything(data);
+		exit(1);
 	}
+	ft_putendl_fd(curr_dir, STDOUT_FILENO);
+	return (data->errnum = 0, TRUE);
 }

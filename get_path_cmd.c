@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 10:40:10 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/02 17:06:19 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/15 12:39:23 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,20 @@ static void	free_path(char *path)
 	path = NULL;
 }
 
-static char	**split_path(t_data *data, char *path)
+static char	**split_path(t_data *data, char *path, t_list_node *curr_list)
 {
 	char	**path_split;
 
-	(void)data;
+	if (path == NULL)
+		path_error(data, curr_list->cmd);
 	path_split = ft_split(path, ':');
 	if (!path_split)
 	{
+		free_everything(data);
+		free_path(path);
 		exit(1);
-		// free_path(path);
-		// free_2d(av);
-		// free_mem(data, 1);
 	}
+	free_path(path);
 	return (path_split);
 }
 
@@ -38,16 +39,25 @@ static void	check_slash(t_data *data, t_list_node *curr_list)
 {
 	if (ft_strchr(curr_list->cmd->value, '/') != NULL)
 	{
+		if (is_directory(curr_list->cmd->value) == 1)
+		{
+			ft_putstr_fd("minishell: ", 2);
+			ft_putstr_fd(curr_list->cmd->value, 2);
+			ft_putstr_fd(": ", 2);
+			ft_putendl_fd(" is a directory", 2);
+			free_everything(data);
+			exit(126);
+		}
 		if (access(curr_list->cmd->value, X_OK) != -1)
 			go_exec(data, curr_list);
 		else if (errno == 13)
 		{
+			ft_putstr_fd("minishell: ", 2);
 			ft_putstr_fd(curr_list->cmd->value, 2);
 			ft_putstr_fd(": ", 2);
 			ft_putendl_fd(strerror(errno), 2);
-			// free_2d(spl_av);
+			free_everything(data);
 			exit(126);
-			// free_mem(data, 126);
 		}
 		else
 			path_error(data, curr_list->cmd);
@@ -61,11 +71,9 @@ static void	ext_path(t_list_node *curr_list, t_data *data, char *path_exec)
 	char	**path2;
 	int		i;
 
-	errno = 0;
 	check_slash(data, curr_list);
-	path = ft_substr(path_exec, 5, data->len_path);
-	path2 = split_path(data, path);
-	free_path(path);
+	path2 = split_path(data, ft_substr(path_exec, 5, data->len_path), \
+	curr_list);
 	i = 0;
 	while (path2[i])
 	{
@@ -81,9 +89,7 @@ static void	ext_path(t_list_node *curr_list, t_data *data, char *path_exec)
 		free_path(path);
 		i++;
 	}
-	// free_2d(path2);
-	if (errno != 0)
-		cmd_error(data, curr_list->cmd);
+	cmd_error(data, curr_list->cmd);
 }
 
 void	get_path(t_list_node *curr_list, t_data *data)
@@ -97,8 +103,10 @@ void	get_path(t_list_node *curr_list, t_data *data)
 	path_exec = NULL;
 	while (data->env[i])
 	{
-		data->len_path = ft_strlen(data->env[i]);
 		status = find_path(data->env[i]);
+		data->len_path = ft_strlen(data->env[i]);
+		if (status == 1 && data->len_path == 5)
+			break ;
 		if (status == 1)
 		{
 			path_exec = data->env[i];
@@ -106,7 +114,7 @@ void	get_path(t_list_node *curr_list, t_data *data)
 		}
 		i++;
 	}
-	if (status == 0)
+	if (access(curr_list->cmd->value, X_OK) == -1 && status == 0)
 		path_error(data, curr_list->cmd);
 	ext_path(curr_list, data, path_exec);
 }

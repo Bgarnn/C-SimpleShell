@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kburalek <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/22 13:29:22 by kburalek          #+#    #+#              #
-#    Updated: 2023/02/22 13:29:25 by kburalek         ###   ########.fr        #
+#    Updated: 2023/11/07 21:09:28 by plertsir         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,8 +23,7 @@ SRC = ft_bzero.c ft_isalnum.c ft_isalpha.c ft_isascii.c ft_isdigit.c ft_isprint.
 	  ft_tolower.c ft_atoi.c ft_strchr.c ft_strrchr.c ft_strncmp.c ft_strnstr.c \
 	  ft_strdup.c ft_calloc.c ft_memchr.c ft_memcmp.c ft_strlcat.c ft_substr.c \
 	  ft_strjoin.c ft_strtrim.c ft_itoa.c ft_split.c ft_strmapi.c ft_striteri.c \
-	  ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_malloczero.c \
-	  get_next_line.c get_next_line_utils.c
+	  ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_malloczero.c
 
 # Bonus Source Files (if applicable)
 SRC_BONUS = ft_lstnew_bonus.c ft_lstadd_front_bonus.c ft_lstsize_bonus.c \
@@ -44,24 +43,24 @@ all: $(NAME)
 
 # Compilation Rule for C Files
 $(OBJ_DIR)%.o: %.c
-	@mkdir -p $(@D)
-	@$(CC) $(CFLAGS) -c $< -o $@
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Target to Create the Library
 $(NAME): $(OBJS)
-	@ar rcs $(NAME) $(OBJS)
+	ar rcs $(NAME) $(OBJS)
 
 # Bonus Target (if applicable)
 bonus: $(OBJS_BONUS)
-	@ar rcs $(NAME) $(OBJS_BONUS)
+	ar rcs $(NAME) $(OBJS_BONUS)
 
 # Clean Up Object Files
 clean:
-	@rm -rf $(OBJ_DIR)
+	rm -rf $(OBJ_DIR)
 
 # Clean Everything
 fclean: clean
-	@rm -f $(NAME)
+	rm -f $(NAME)
 
 # Rebuild Everything
 re: fclean all

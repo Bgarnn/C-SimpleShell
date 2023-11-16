@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kburalek <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/21 13:43:27 by kburalek          #+#    #+#             */
-/*   Updated: 2023/04/21 13:44:02 by kburalek         ###   ########.fr       */
+/*   Updated: 2023/11/07 21:06:30 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,4 +16,3 @@ void	ft_bzero(void *str, size_t num)
 {
 	ft_memset(str, 0, num);
 }
-// fill zero to (str), (num) byte

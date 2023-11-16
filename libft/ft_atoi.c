@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kburalek <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 16:11:31 by kburalek          #+#    #+#             */
-/*   Updated: 2023/02/15 16:11:34 by kburalek         ###   ########.fr       */
+/*   Updated: 2023/11/07 21:05:55 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,3 @@ int	ft_atoi(const char *str)
 	}
 	return (nb * sign);
 }
-// convert ascii (str) to ineger

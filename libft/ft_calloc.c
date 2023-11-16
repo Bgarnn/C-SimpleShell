@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kburalek <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/21 13:45:07 by kburalek          #+#    #+#             */
-/*   Updated: 2023/04/21 15:31:51 by kburalek         ###   ########.fr       */
+/*   Updated: 2023/11/07 21:05:59 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,3 @@ void	*ft_calloc(size_t num, size_t size)
 	}
 	return (NULL);
 }
-// allocate space for (num) objects, (size) byte each
-// fill with zero byte value

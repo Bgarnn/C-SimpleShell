@@ -6,13 +6,13 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/31 15:18:25 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/02 18:08:58 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/07 21:31:18 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	check_numchild(t_data *data)
+static void	check_numchild(t_data *data)
 {
 	t_list_node	*run;
 	int			i;
@@ -27,7 +27,7 @@ void	check_numchild(t_data *data)
 	data->num_child = i;
 }
 
-int	prep_before_fork(t_data *data, t_list_node *curr_list)
+static int	prep_before_fork(t_data *data, t_list_node *curr_list)
 {
 	check_numchild(data);
 	data->pid = malloc(sizeof(int) * data->num_child);
@@ -40,7 +40,7 @@ int	prep_before_fork(t_data *data, t_list_node *curr_list)
 	return (TRUE);
 }
 
-void	wait_child(t_data *data)
+static void	wait_child(t_data *data)
 {
 	int		i;
 
@@ -49,10 +49,16 @@ void	wait_child(t_data *data)
 		waitpid(data->pid[i++], &data->errnum, WUNTRACED);
 	free(data->pid);
 	data->pid = NULL;
-	dup2(data->stdin_copy, STDIN_FILENO);
-	dup2(data->stdout_copy, STDOUT_FILENO);
 	if (data->builtin_parent != 1)
 		data->errnum = WEXITSTATUS(data->errnum);
+}
+
+static void	restore_fd(t_data *data)
+{
+	dup2(data->stdin_copy, STDIN_FILENO);
+	dup2(data->stdout_copy, STDOUT_FILENO);
+	close(data->stdin_copy);
+	close(data->stdout_copy);
 }
 
 int	first_execute(t_data *data)
@@ -61,6 +67,7 @@ int	first_execute(t_data *data)
 	t_list_node	*curr_list;
 
 	data->builtin_parent = 0;
+	data->child_born = 0;
 	curr_list = data->grouped_token;
 	data->index = 0;
 	if (prep_before_fork(data, curr_list) == FALSE)
@@ -70,10 +77,13 @@ int	first_execute(t_data *data)
 		if (pipe(fd_pipe) == -1)
 			return (ft_putstr_fd("pipe error\n", 2), FALSE);
 		fork_child(data, curr_list, &fd_pipe[1], &fd_pipe[0]);
+		close(fd_pipe[0]);
+		close(fd_pipe[1]);
 		curr_list = curr_list->next;
 		data->index++;
 	}
+	restore_fd(data);
 	wait_child(data);
-	// free_everything(data);
+	data->pid = 0;
 	return (TRUE);
 }

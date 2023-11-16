@@ -1,25 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstiter_bonus.c                                 :+:      :+:    :+:   */
+/*   env_built_in.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/25 16:01:50 by kburalek          #+#    #+#             */
-/*   Updated: 2023/11/07 21:06:10 by plertsir         ###   ########.fr       */
+/*   Created: 2023/11/06 15:11:54 by plertsir          #+#    #+#             */
+/*   Updated: 2023/11/15 13:39:27 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-void	ft_lstiter(t_list *lst, void (*f)(void *))
+void	call_env(t_data *data, t_token_node *curr_token)
 {
-	if (lst != 0 && f != 0)
+	size_t	i;
+
+	i = 0;
+	if (curr_token->next != NULL)
 	{
-		while (lst != 0)
+		ft_putstr_fd("minishell: env: ", 2);
+		ft_putendl_fd("too many arguments", 2);
+		if (data->builtin_parent == 1)
+			data->errnum = 1;
+		else
 		{
-			f(lst->content);
-			lst = lst->next;
+			free_everything(data);
+			exit(1);
 		}
+	}
+	while (data->env[i])
+	{
+		ft_putendl_fd(data->env[i], 1);
+		i++;
 	}
 }
