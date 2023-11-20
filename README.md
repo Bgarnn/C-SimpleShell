@@ -17,12 +17,12 @@ Welcome to Minishell, a project that brings the power of a Unix shell to your fi
 To compile the Minishell program, follow these straightforward steps:
 
   - Clone the Repository:
-        - git clone git@github.com:Bgarnn/03-Minishell.git
-        - cd 03-Minishell
+    - git clone git@github.com:Bgarnn/03-Minishell.git
+    - cd 03-Minishell
   - Compile the Program:
-        - make: This will generate the minishell executable.
+    - make: This will generate the minishell executable.
   - Clean the Build:
-        - make clean: This removes the object files, leaving only the compiled program.
+    - make clean: This removes the object files, leaving only the compiled program.
 
 ** Now you can use Minishell to interact with the operating system through a command-line interface!
 
