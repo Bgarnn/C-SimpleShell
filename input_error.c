@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/29 11:48:09 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/07 21:00:20 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 10:14:28 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,4 +66,14 @@ void	cd_path_error(t_data *data, t_token_node *curr_token)
 		free_everything(data);
 		exit(1);
 	}
+}
+
+void	permis_error(t_data *data, t_token_node *curr_token)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(curr_token->value, 2);
+	ft_putstr_fd(": ", 2);
+	ft_putendl_fd(strerror(errno), 2);
+	free_everything(data);
+	exit(126);
 }

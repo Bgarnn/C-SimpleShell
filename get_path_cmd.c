@@ -6,19 +6,20 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 10:40:10 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 12:39:23 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 21:45:06 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	free_path(char *path)
+static void	ext_path_err(t_data *data, t_list_node *curr_list, int err_num)
 {
-	free(path);
-	path = NULL;
+	if (err_num == 13)
+		permis_error(data, curr_list->cmd);
+	cmd_error(data, curr_list->cmd);
 }
 
-static char	**split_path(t_data *data, char *path, t_list_node *curr_list)
+char	**split_path(t_data *data, char *path, t_list_node *curr_list)
 {
 	char	**path_split;
 
@@ -35,7 +36,7 @@ static char	**split_path(t_data *data, char *path, t_list_node *curr_list)
 	return (path_split);
 }
 
-static void	check_slash(t_data *data, t_list_node *curr_list)
+void	check_slash(t_data *data, t_list_node *curr_list)
 {
 	if (ft_strchr(curr_list->cmd->value, '/') != NULL)
 	{
@@ -51,14 +52,7 @@ static void	check_slash(t_data *data, t_list_node *curr_list)
 		if (access(curr_list->cmd->value, X_OK) != -1)
 			go_exec(data, curr_list);
 		else if (errno == 13)
-		{
-			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(curr_list->cmd->value, 2);
-			ft_putstr_fd(": ", 2);
-			ft_putendl_fd(strerror(errno), 2);
-			free_everything(data);
-			exit(126);
-		}
+			permis_error(data, curr_list->cmd);
 		else
 			path_error(data, curr_list->cmd);
 	}
@@ -74,8 +68,10 @@ static void	ext_path(t_list_node *curr_list, t_data *data, char *path_exec)
 	check_slash(data, curr_list);
 	path2 = split_path(data, ft_substr(path_exec, 5, data->len_path), \
 	curr_list);
-	i = 0;
-	while (path2[i])
+	i = -1;
+	if (is_bash(curr_list, data) == FALSE)
+		bash_err(data, curr_list->cmd);
+	while (path2[++i])
 	{
 		tmp = ft_strjoin(path2[i], "/");
 		path = ft_strjoin(tmp, curr_list->cmd->value);
@@ -87,9 +83,8 @@ static void	ext_path(t_list_node *curr_list, t_data *data, char *path_exec)
 			go_exec(data, curr_list);
 		}
 		free_path(path);
-		i++;
 	}
-	cmd_error(data, curr_list->cmd);
+	ext_path_err(data, curr_list, errno);
 }
 
 void	get_path(t_list_node *curr_list, t_data *data)

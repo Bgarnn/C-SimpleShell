@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 16:28:48 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 19:05:15 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 16:49:43 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,14 @@ static void	check_home(t_data *data, t_token_node *curr_token)
 
 void	change_dir(t_data *data, t_list_node *curr_list)
 {
-	int		i;
 	char	*tmp;
 	char	curr_pwd[PATH_MAX];
 
-	i = 0;
 	if (curr_list->cmd->next != NULL)
 	{
 		getcwd(curr_pwd, PATH_MAX);
 		if (ft_strcmp(curr_list->cmd->next->value, "-") == 0)
-			cd_old(data);
+			old_pwd_check(data, curr_list, curr_pwd);
 		else if (chdir(curr_list->cmd->next->value) != -1)
 		{
 			free(curr_list->cmd->next->value);

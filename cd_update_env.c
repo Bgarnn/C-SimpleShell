@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 15:06:47 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 18:55:09 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/17 17:07:14 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	cd_old(t_data *data)
 	old_pwd = NULL;
 	while (data->env[i])
 	{
-		if (is_duplicate(data->env[i], "OLDPWD=") == 1)
+		if (is_duplicate(data->env[i], "OLDPWD") == 1)
 		{
 			old_pwd = data->env[i];
 			break ;
@@ -80,7 +80,7 @@ void	cd_update_old(t_data *data, char *old_pwd)
 	i = 0;
 	while (data->env[i])
 	{
-		if (is_duplicate(data->env[i], "OLDPWD=") == 1)
+		if (is_duplicate(data->env[i], "OLDPWD") == 1)
 		{
 			new_pwd = ft_strjoin("OLDPWD=", old_pwd);
 			free(data->env[i]);
@@ -107,7 +107,7 @@ void	cd_update(t_data *data, char *old_pwd)
 	}
 	while (data->env[i])
 	{
-		if (is_duplicate(data->env[i], "PWD=") == 1)
+		if (is_duplicate(data->env[i], "PWD") == 1)
 		{
 			new_pwd = ft_strjoin("PWD=", curr_pwd);
 			free(data->env[i]);

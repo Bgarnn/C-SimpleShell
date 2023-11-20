@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/01 15:14:15 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/07 21:33:17 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 12:10:22 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ int *pipe_w, int *pipe_r)
 	}
 	if (curr_list->cmd != NULL && check_builtin_child(data, curr_list) == FALSE)
 	{
-		if (before_child_exe(data, curr_list) == TRUE)
+		if (data->builtin_parent != 1 && \
+		before_child_exe(data, curr_list) == TRUE)
 			get_path(curr_list, data);
 	}
 	exit(0);

@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/01 14:05:57 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 18:55:17 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 16:49:24 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,35 @@ typedef struct s_data
 	int					child_born;
 }						t_data;
 
+//P'karn
+char	*strjoin_f(char *src, char *dst);
+void	make_token(t_token_ptr *ptr, t_token_mark mark, char *str);
+int		mns_init(t_data *data, char **envp);
+void	group_init(t_group_ptr	*group);
+int		row_count(char **str);
+int		env_find(char **envp, char *key);
+char	*shlvl_update(char **envp);
+char	*env_ky(char **env, char *key);
+int		main_while(t_data *data);
+void	input_to_token(t_data *data, char *input);
+void	split_heredoc(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
+void	split_out_app(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
+void	split_out_tr(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
+void	split_infile(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
+void	split_pipe(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
+void	split_dollar0(t_data *data, t_token_ptr *dst_ptr, t_token_node *src_h);
+void	split_dollar1(t_data *data, t_token_ptr *dst_ptr, t_token_node *src_h);
+char	*match_outside_qoute(char *p_tmp, char *must_match, int match_in_dbq);
+void	env_check(char **env_rpl, char **p_nonchar, char **p_same, \
+			t_data *data);
+size_t	index_of_c(const char *s, int c);
+char	*env_k(t_data *data, char *key);
+void	token_to_organize(t_data *data, t_token_ptr *input);
+void	free_mns(t_data *data);
+void	free_group_list(t_list_node *list_head);
+void	free_token_list(t_token_node *token_ptr);
+void	free_char_2d(char **ptr);
+
 int		first_execute(t_data *data);
 void	path_cpy(char *dst, const char *src);
 int		make_infile(t_list_node *token_center);
@@ -122,6 +151,7 @@ void	go_exec(t_data *data, t_list_node *curr_list);
 void	file_error(t_data *data, char *file);
 void	path_error(t_data *data, t_token_node *curr_token);
 void	cmd_error(t_data *data, t_token_node *curr_token);
+void	permis_error(t_data *data, t_token_node *curr_token);
 //Built in
 int		check_builtin_parent(t_data *data, t_list_node *curr_list);
 int		check_builtin_child(t_data *data, t_list_node *curr_list);
@@ -157,34 +187,18 @@ void	cd_err(t_data *data, t_list_node *curr_list, int errno_nb);
 void	cd_old(t_data *data);
 void	cd_update_old(t_data *data, char *old_pwd);
 char	*find_home(t_data *data);
-
-//first_part
-char	*strjoin_f(char *src, char *dst);
-void	make_token(t_token_ptr *ptr, t_token_mark mark, char *str);
-int		mns_init(t_data *data, char **envp);
-void	group_init(t_group_ptr	*group);
-int		row_count(char **str);
-int		env_find(char **envp, char *key);
-char	*shlvl_update(char **envp);
-char	*env_ky(char **env, char *key);
-int		main_while(t_data *data);
-void	input_to_token(t_data *data, char *input);
-void	split_heredoc(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
-void	split_out_app(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
-void	split_out_tr(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
-void	split_infile(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
-void	split_pipe(t_data *data, t_token_ptr *p_tmp, t_token_node *src_h);
-void	split_dollar0(t_data *data, t_token_ptr *dst_ptr, t_token_node *src_h);
-void	split_dollar1(t_data *data, t_token_ptr *dst_ptr, t_token_node *src_h);
-char	*match_outside_qoute(char *p_tmp, char *must_match, int match_in_dbq);
-void	env_check(char **env_rpl, char **p_nonchar, char **p_same, \
-			t_data *data);
-size_t	index_of_c(const char *s, int c);
-char	*env_k(t_data *data, char *key);
-void	token_to_organize(t_data *data, t_token_ptr *input);
-void	free_mns(t_data *data);
-void	free_group_list(t_list_node *list_head);
-void	free_token_list(t_token_node *token_ptr);
-void	free_char_2d(char **ptr);
+void	execve_bash(t_data *data, t_token_node *curr_token);
+int		is_bash(t_list_node *curr_list, t_data *data);
+void	bash_err(t_data *data, t_token_node *curr_token);
+void	free_path(char *path);
+void	is_bash_exe(t_data *data, t_token_node	*head_cmd);
+int		check_new_env(t_data *data, t_token_node *curr_token, int *status);
+int		search_duplicate(t_data *data, t_token_node *curr_token);
+int		before_export(t_data *data, t_token_node *curr_token);
+void	make_new_env(t_data *data, t_token_node *curr_token, char **new_env);
+int		check_before_unset(t_data *data, t_token_node *curr_token, int *status);
+int		before_unset(t_data *data, t_token_node *curr_token);
+void	loop_unset(t_data *data, t_token_node *curr_token, char **new_env);
+void	old_pwd_check(t_data *data, t_list_node *curr_list, char *curr_pwd);
 
 #endif

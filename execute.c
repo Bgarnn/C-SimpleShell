@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/02 11:27:51 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 12:40:52 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 15:42:19 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,14 +71,16 @@ static void	path_err(t_data *data, char **path_exec)
 
 void	go_exec(t_data *data, t_list_node *curr_list)
 {
-	char	**path_exec;
-	size_t	len_av;
-	size_t	len_cmd;
+	char			**path_exec;
+	size_t			len_av;
+	size_t			len_cmd;
+	t_token_node	*head_cmd;
 
 	len_av = len_spl_av(curr_list->cmd);
 	len_cmd = ft_strlen(curr_list->cmd->value);
 	path_exec = malloc_path_exec(data, len_av, len_cmd);
 	path_cpy(&(*path_exec[0]), curr_list->cmd->value);
+	head_cmd = curr_list->cmd;
 	curr_list->cmd = curr_list->cmd->next;
 	data->index = 1;
 	while (curr_list->cmd != NULL)
@@ -92,5 +94,5 @@ void	go_exec(t_data *data, t_list_node *curr_list)
 		data->index++;
 	}
 	execve(path_exec[0], path_exec, data->env);
-	execeve_fail(data, curr_list->cmd);
+	is_bash_exe(data, head_cmd);
 }

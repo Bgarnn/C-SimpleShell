@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/05 20:24:24 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 18:36:16 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 15:44:12 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ char	*join_quote(char *env_copy)
 		i++;
 	tmp = ft_strchr(&env_copy[0], '=');
 	front = ft_substr(&env_copy[0], 0, tmp - &env_copy[0] + 1);
-	back = ft_substr(&env_copy[0], i + 1,  ft_strlen(env_copy) - (size_t)tmp);
+	back = ft_substr(&env_copy[0], i + 1, ft_strlen(env_copy) - (size_t)tmp);
 	combine = ft_strjoin("\"", back);
 	free(back);
 	tmp = combine;
@@ -92,7 +92,7 @@ void	sort_env(t_data *data, char **env_copy)
 				env_copy[j] = env_copy[j + 1];
 				env_copy[j + 1] = tmp;
 			}
-			j++;   
+			j++;
 		}
 		i++;
 	}

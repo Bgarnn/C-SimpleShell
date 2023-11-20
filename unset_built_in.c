@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 09:38:38 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 14:40:20 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 16:06:30 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,12 @@ static int	is_need_to_unset(t_data *data, t_token_node *curr_token)
 	return (FALSE);
 }
 
-static int	before_unset(t_data *data, t_token_node *curr_token)
+int	before_unset(t_data *data, t_token_node *curr_token)
 {
 	if (curr_token == NULL)
 		return (FALSE);
 	else if (is_valid_unset(data, curr_token) == FALSE)
-		return (FALSE);
+		return (unset_err(data, curr_token), FALSE);
 	else if (is_need_to_unset(data, curr_token) == FALSE)
 		return (FALSE);
 	return (TRUE);
@@ -58,26 +58,23 @@ static int	before_unset(t_data *data, t_token_node *curr_token)
 int	unset_env(t_data *data, t_token_node *curr_token)
 {
 	char	**new_env;
-	size_t	i;
-	size_t	j;
+	int		status;
 
-	i = 0;
-	j = 0;
-	if (before_unset(data, curr_token) == FALSE)
-		return (FALSE);
-	data->env_row_max = data->env_row_max - 1;
-	new_env = (char **)ft_calloc(sizeof(char *), data->env_row_max + 1);
-	if (!new_env)
-		return (ft_putendl_fd("malloc error", 2), FALSE);
-	while (i < data->env_row_max)
+	while (curr_token != NULL)
 	{
-		if (is_duplicate(data->env[j], curr_token->value) == 1)
-			j++;
-		new_env[i] = ft_strdup(data->env[j]);
-		i++;
-		j++;
+		if (check_before_unset(data, curr_token, &status) == TRUE)
+		{
+			curr_token = curr_token->next;
+			continue ;
+		}
+		data->env_row_max = data->env_row_max - 1;
+		new_env = (char **)ft_calloc(sizeof(char *), data->env_row_max + 1);
+		if (!new_env)
+			return (ft_putendl_fd("malloc error", 2), FALSE);
+		loop_unset(data, curr_token, new_env);
+		curr_token = curr_token->next;
 	}
-	free_env(data->env);
-	data->env = new_env;
+	if (status == 1)
+		return (FALSE);
 	return (TRUE);
 }

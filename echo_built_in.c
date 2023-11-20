@@ -6,7 +6,7 @@
 /*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 20:45:03 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/15 13:38:21 by plertsir         ###   ########.fr       */
+/*   Updated: 2023/11/16 15:43:40 by plertsir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ static void	echo_no_flag(t_token_node *curr_token)
 
 void	echo_words(t_data *data, t_token_node *curr_token)
 {
-
 	if (curr_token == NULL)
 	{
 		printf("\n");
