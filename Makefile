@@ -4,7 +4,7 @@ FLAGS = -Wall -Wextra -Werror
 # FLAGS = -fsanitize=address -g
 
 LIBFT = $(LIBFT_DIRECTORY)libft.a
-LIBFT_DIRECTORY = ./libft/
+LIBFT_DIRECTORY = ./customLib/
 
 # READLINE = /usr/local/opt/readline
 

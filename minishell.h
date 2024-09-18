@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: plertsir <plertsir@student.42bangkok.co    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/01 14:05:57 by plertsir          #+#    #+#             */
-/*   Updated: 2023/11/16 16:49:24 by plertsir         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -23,7 +11,7 @@
 # include <string.h>
 # include <sys/types.h>
 # include <sys/stat.h>
-# include "libft/libft.h"
+# include "customLib/libft.h"
 # include <readline/readline.h>
 # include <readline/history.h>
 
